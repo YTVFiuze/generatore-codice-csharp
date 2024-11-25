@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 // Funzione serverless per la generazione del codice
 export default async function handler(req, res) {
     // Abilita CORS
@@ -26,6 +28,10 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify(req.body)
         });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const data = await response.json();
         res.status(200).json(data);
