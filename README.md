@@ -12,6 +12,12 @@ Un'applicazione web moderna per generare codice C# utilizzando l'intelligenza ar
 - 🔄 Copia del codice con un click
 - 🇮🇹 Nomi e commenti in italiano
 
+## Configurazione
+
+1. Ottieni una chiave API da [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Copia il file `config.sample.js` in `config.js`
+3. Inserisci la tua chiave API nel file `config.js`
+
 ## Tecnologie Utilizzate
 
 - HTML5
