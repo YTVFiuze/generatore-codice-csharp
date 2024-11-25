@@ -1,20 +1,14 @@
 import fetch from 'node-fetch';
 
-// Funzione serverless per la generazione del codice
 export default async function handler(req, res) {
-    // Abilita CORS
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
-
-    // Gestisci le richieste OPTIONS (pre-flight)
     if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+        res.setHeader('Access-Control-Allow-Credentials', true);
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+        res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+        return res.status(200).end();
     }
 
-    // Verifica il metodo della richiesta
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
