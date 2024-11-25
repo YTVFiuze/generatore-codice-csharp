@@ -230,11 +230,11 @@
 
         async function generateCode(prompt) {
             try {
+                console.log('Inviando richiesta con prompt:', prompt);
                 const response = await fetch('https://generatore-codice-csharp.vercel.app/api/generate', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Origin': window.location.origin
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         contents: [{
@@ -264,14 +264,34 @@ REQUISITI:
                     })
                 });
 
+                console.log('Risposta ricevuta - Status:', response.status);
+                const responseText = await response.text();
+                console.log('Risposta ricevuta - Body:', responseText);
+
                 if (!response.ok) {
-                    throw new Error('Errore nella richiesta API');
+                    try {
+                        const errorData = JSON.parse(responseText);
+                        console.error('Errore API:', errorData);
+                        throw new Error(errorData.error || 'Errore nella richiesta API');
+                    } catch (e) {
+                        console.error('Errore nel parsing della risposta:', e);
+                        throw new Error('Errore nella richiesta API: ' + responseText);
+                    }
                 }
 
-                const data = await response.json();
-                return data.candidates[0].content.parts[0].text;
+                try {
+                    const data = JSON.parse(responseText);
+                    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                        console.error('Risposta API non valida:', data);
+                        throw new Error('Risposta API non valida');
+                    }
+                    return data.candidates[0].content.parts[0].text;
+                } catch (e) {
+                    console.error('Errore nel parsing dei dati:', e);
+                    throw new Error('Errore nel formato della risposta');
+                }
             } catch (error) {
-                console.error('Errore:', error);
+                console.error('Errore completo:', error);
                 throw error;
             }
         }
