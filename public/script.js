@@ -1,7 +1,7 @@
 // Funzione per generare codice usando l'AI
 export async function generateWithAI(prompt) {
     try {
-        const response = await fetch('/api/generate', {
+        const response = await fetch('https://generatore-codice-csharp-a8vf-i1xeo6acg-lucas-projects-ee259182.vercel.app/api/generate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
