@@ -1,5 +1,3 @@
-import { GEMINI_API_KEY, GENERATION_CONFIG } from './config.js';
-
 // Funzione per generare codice usando l'AI
 export async function generateWithAI(prompt) {
     try {
@@ -49,44 +47,7 @@ NON includere commenti XML (///). Usa SOLO nomi e commenti in italiano.`
             throw new Error('Risposta API non valida');
         }
 
-        let code = data.candidates[0].content.parts[0].text;
-        
-        // Rimuovi eventuali markdown code blocks e spazi extra
-        code = code.replace(/```c#|```csharp|```/g, '').trim();
-        
-        // Rimuovi eventuali commenti XML rimasti
-        code = code.replace(/\/\/\/.*\n/g, '');
-        
-        // Verifica che il codice contenga elementi C# validi
-        const csharpIndicators = [
-            'class ',
-            'interface ',
-            'struct ',
-            'enum ',
-            'namespace ',
-            'using ',
-            'public ',
-            'private ',
-            'protected ',
-            'static ',
-            'void ',
-            'int ',
-            'string ',
-            'bool ',
-            'var '
-        ];
-        
-        if (!csharpIndicators.some(indicator => code.includes(indicator))) {
-            console.warn('Generated code does not contain valid C# indicators:', code);
-            throw new Error('Il codice generato non sembra essere C# valido');
-        }
-
-        // Se il codice sembra valido, aggiunge intestazione se manca
-        if (!code.includes('using System') && !code.includes('namespace')) {
-            code = 'using System;\n\n' + code;
-        }
-
-        return code;
+        return data.candidates[0].content.parts[0].text;
     } catch (error) {
         console.error('Errore durante la generazione:', error);
         throw error;
