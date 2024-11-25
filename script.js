@@ -3,11 +3,10 @@ import { GEMINI_API_KEY, GENERATION_CONFIG } from './config.js';
 // Funzione per generare codice usando l'AI
 export async function generateWithAI(prompt) {
     try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', {
+        const response = await fetch('https://generatore-codice-csharp.vercel.app/api/generate', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'x-goog-api-key': GEMINI_API_KEY
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 contents: [{
@@ -28,13 +27,12 @@ REQUISITI:
 8. Usa commenti // in italiano quando necessario per spiegare la logica
 
 Il codice deve essere pronto per la produzione e seguire le convenzioni C# moderne.
-NON includere commenti XML (///). Usa SOLO nomi e commenti in italiano.
-Rispondi SOLO con il codice C#, senza spiegazioni o altro testo.`
+NON includere commenti XML (///). Usa SOLO nomi e commenti in italiano.`
                     }]
                 }],
                 generationConfig: {
-                    ...GENERATION_CONFIG,
-                    temperature: 0.2,
+                    temperature: 0.7,
+                    maxOutputTokens: 1000,
                     topP: 0.8,
                     topK: 40
                 }
@@ -42,28 +40,16 @@ Rispondi SOLO con il codice C#, senza spiegazioni o altro testo.`
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            console.error('API Error:', errorData);
-            throw new Error(`Errore API (${response.status}): ${errorData.error?.message || 'Errore sconosciuto'}`);
+            throw new Error('Errore nella richiesta API');
         }
 
         const data = await response.json();
-        console.log('API Response:', data);
         
-        // Estrai il codice dalla risposta
-        let code = '';
-        
-        try {
-            if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                code = data.candidates[0].content.parts[0].text;
-            } else {
-                console.warn('Unexpected API response structure:', data);
-                throw new Error('Formato risposta API non valido');
-            }
-        } catch (error) {
-            console.error('Error extracting code from response:', error);
-            throw new Error('Errore nell\'elaborazione della risposta');
+        if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+            throw new Error('Risposta API non valida');
         }
+
+        let code = data.candidates[0].content.parts[0].text;
         
         // Rimuovi eventuali markdown code blocks e spazi extra
         code = code.replace(/```c#|```csharp|```/g, '').trim();
@@ -102,22 +88,18 @@ Rispondi SOLO con il codice C#, senza spiegazioni o altro testo.`
 
         return code;
     } catch (error) {
-        console.error('Errore nella generazione:', error);
+        console.error('Errore durante la generazione:', error);
         throw error;
     }
 }
 
 // Funzione per copiare il codice negli appunti
-export function copyToClipboard() {
-    const generatedCode = document.getElementById('generatedCode').textContent;
-    navigator.clipboard.writeText(generatedCode).then(() => {
-        const copyFeedback = document.getElementById('copyFeedback');
-        copyFeedback.classList.add('show');
-        setTimeout(() => {
-            copyFeedback.classList.remove('show');
-        }, 2000);
-    }).catch(err => {
-        console.error('Errore durante la copia:', err);
-        alert('Non è stato possibile copiare il codice. Per favore, copialo manualmente.');
-    });
+export async function copyToClipboard(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        return true;
+    } catch (error) {
+        console.error('Errore durante la copia:', error);
+        return false;
+    }
 }
