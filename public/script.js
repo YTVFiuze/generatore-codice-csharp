@@ -1,7 +1,7 @@
 // Funzione per generare codice usando l'AI
 export async function generateWithAI(prompt) {
     try {
-        const response = await fetch('https://generatore-codice-csharp-a8vf-i1xeo6acg-lucas-projects-ee259182.vercel.app/api/generate', {
+        const response = await fetch('https://generatore-codice-csharp.vercel.app/api/generate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -38,12 +38,15 @@ NON includere commenti XML (///). Usa SOLO nomi e commenti in italiano.`
         });
 
         if (!response.ok) {
+            const errorData = await response.text();
+            console.error('API error:', errorData);
             throw new Error('Errore nella richiesta API');
         }
 
         const data = await response.json();
         
         if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+            console.error('Invalid API response:', data);
             throw new Error('Risposta API non valida');
         }
 

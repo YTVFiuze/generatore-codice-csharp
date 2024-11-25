@@ -1,19 +1,30 @@
 {
     "version": 2,
-    "headers": [
+    "builds": [
         {
-            "source": "/api/(.*)",
-            "headers": [
-                { "key": "Access-Control-Allow-Origin", "value": "https://generatore-codice-csharp-a8vf-i1xeo6acg-lucas-projects-ee259182.vercel.app" },
-                { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
-                { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
-            ]
+            "src": "api/**/*.js",
+            "use": "@vercel/node"
+        },
+        {
+            "src": "public/**/*",
+            "use": "@vercel/static"
         }
     ],
-    "rewrites": [
+    "routes": [
         {
-            "source": "/api/generate",
-            "destination": "/api/generate.js"
+            "src": "/api/generate",
+            "methods": ["OPTIONS", "POST"],
+            "dest": "/api/generate.js",
+            "headers": {
+                "Access-Control-Allow-Origin": "https://generatore-codice-csharp-a8vf-i1xeo6acg-lucas-projects-ee259182.vercel.app",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Max-Age": "86400"
+            }
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/public/$1"
         }
     ]
 }
