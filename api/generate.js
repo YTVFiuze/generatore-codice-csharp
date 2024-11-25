@@ -1,12 +1,13 @@
 import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
-    // Gestisci le richieste OPTIONS (pre-flight)
+    // Imposta gli header CORS per tutte le risposte
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Origin');
+
+    // Gestisci le richieste OPTIONS
     if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Allow-Origin', 'https://generatore-codice-csharp-a8vf-i1xeo6acg-lucas-projects-ee259182.vercel.app');
-        res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-        res.setHeader('Access-Control-Max-Age', '86400');
         return res.status(200).end();
     }
 
@@ -15,33 +16,51 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // Imposta gli header CORS per le richieste POST
-    res.setHeader('Access-Control-Allow-Origin', 'https://generatore-codice-csharp-a8vf-i1xeo6acg-lucas-projects-ee259182.vercel.app');
-
     try {
+        // Verifica la presenza della chiave API
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            console.error('GEMINI_API_KEY non trovata');
+            return res.status(500).json({ error: 'Configurazione API mancante' });
+        }
+
+        // Effettua la richiesta a Gemini
         const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-goog-api-key': process.env.GEMINI_API_KEY
+                'x-goog-api-key': apiKey
             },
             body: JSON.stringify(req.body)
         });
-        
+
+        // Gestisci gli errori HTTP
         if (!response.ok) {
-            const errorData = await response.text();
-            console.error('Gemini API error:', errorData);
-            return res.status(500).json({ 
-                error: 'Errore durante la generazione del codice',
-                details: errorData
+            const errorText = await response.text();
+            console.error('Errore Gemini API:', errorText);
+            return res.status(response.status).json({
+                error: 'Errore nella chiamata a Gemini API',
+                details: errorText
             });
         }
-        
+
+        // Processa la risposta
         const data = await response.json();
+        
+        // Verifica la validità della risposta
+        if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            console.error('Risposta Gemini non valida:', data);
+            return res.status(500).json({ error: 'Risposta API non valida' });
+        }
+
+        // Invia la risposta
         return res.status(200).json(data);
     } catch (error) {
-        console.error('Errore:', error);
-        return res.status(500).json({ 
+        // Log dell'errore
+        console.error('Errore interno:', error);
+        
+        // Invia risposta di errore
+        return res.status(500).json({
             error: 'Errore durante la generazione del codice',
             details: error.message
         });

@@ -4,27 +4,22 @@
         {
             "src": "api/**/*.js",
             "use": "@vercel/node"
-        },
-        {
-            "src": "public/**/*",
-            "use": "@vercel/static"
         }
     ],
     "routes": [
         {
-            "src": "/api/generate",
-            "methods": ["OPTIONS", "POST"],
-            "dest": "/api/generate.js",
+            "src": "/api/(.*)",
             "headers": {
-                "Access-Control-Allow-Origin": "https://generatore-codice-csharp-a8vf-i1xeo6acg-lucas-projects-ee259182.vercel.app",
-                "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Max-Age": "86400"
-            }
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "OPTIONS, POST",
+                "Access-Control-Allow-Headers": "Content-Type, Origin"
+            },
+            "continue": true
         },
         {
-            "src": "/(.*)",
-            "dest": "/public/$1"
+            "src": "/api/generate",
+            "methods": ["OPTIONS", "POST"],
+            "dest": "/api/generate.js"
         }
     ]
 }
