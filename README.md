@@ -4,7 +4,7 @@ Un'applicazione web che utilizza l'AI di Google Gemini per generare codice C# in
 
 ## Come Usare
 
-1. Visita l'applicazione su GitHub Pages: [Generatore di Codice C#](https://lucas-projects-ee259182.github.io/generatore-codice-csharp/)
+1. Visita l'applicazione su GitHub Pages: [Generatore di Codice C#](https://github.com/lucas-projects-ee259182/generatore-codice-csharp)
 2. Ottieni una API Key di Google Gemini da: [Google AI Studio](https://makersuite.google.com/app/apikey)
 3. Incolla la tua API Key nel campo apposito
 4. Descrivi il codice C# che vuoi generare
