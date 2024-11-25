@@ -270,19 +270,21 @@
                         contents: [{
                             parts: [{
                                 text: `Sei un esperto sviluppatore C#. Genera il codice C# in base alla richiesta dell'utente.
-Genera solo codice C# valido e compilabile, senza spiegazioni o markdown.
+Genera solo codice C# valido e compilabile, senza spiegazioni, markdown o backticks.
+NON usare \`\`\`c# o \`\`\` all'inizio o alla fine del codice.
 
 RICHIESTA UTENTE: ${prompt}
 
 REQUISITI:
-1. Genera SOLO il codice C# che soddisfa la richiesta
+1. Genera SOLO il codice C# che soddisfa la richiesta, senza backticks o markdown
 2. Includi gli statement 'using' necessari
 3. NON includere commenti XML
 4. Usa nomi di variabili, metodi e classi in italiano
 5. Usa commenti in italiano per spiegare la logica complessa
 6. Il codice deve essere pulito ed efficiente
 7. Supporta qualsiasi tipo di codice C# (classi, interfacce, metodi, LINQ, ecc.)
-8. Usa commenti // in italiano quando necessario per spiegare la logica`
+8. Usa commenti // in italiano quando necessario per spiegare la logica
+9. NON includere \`\`\`c# all'inizio o \`\`\` alla fine del codice`
                             }]
                         }],
                         generationConfig: {
@@ -307,7 +309,10 @@ REQUISITI:
                     throw new Error('Errore nella generazione del codice. Riprova.');
                 }
 
-                return data.candidates[0].content.parts[0].text;
+                // Rimuovi eventuali backticks rimasti
+                let code = data.candidates[0].content.parts[0].text;
+                code = code.replace(/```c#/g, '').replace(/```/g, '').trim();
+                return code;
             } catch (error) {
                 console.error('Errore completo:', error);
                 throw error;
