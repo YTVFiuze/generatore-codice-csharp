@@ -34,9 +34,9 @@ export default async function handler(req, res) {
         }
         
         const data = await response.json();
-        res.status(200).json(data);
+        return res.status(200).json(data);
     } catch (error) {
         console.error('Errore:', error);
-        res.status(500).json({ error: 'Errore durante la generazione del codice' });
+        return res.status(500).json({ error: 'Errore durante la generazione del codice' });
     }
 }

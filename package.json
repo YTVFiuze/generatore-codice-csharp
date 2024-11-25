@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "Generatore di codice C# usando l'AI di Google Gemini",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
-    "dev": "node server.js",
-    "build": "mkdir -p public && cp index.html script.js public/",
-    "vercel-build": "npm run build"
+    "dev": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
     "node-fetch": "^3.3.2"
   }
 }
