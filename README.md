@@ -2,6 +2,8 @@
 
 Un'applicazione web moderna per generare codice C# utilizzando l'intelligenza artificiale di Google Gemini.
 
+🌐 **[Prova l'applicazione](https://ytvfiuze.github.io/generatore-codice-csharp/)**
+
 ## Caratteristiche
 
 - 🤖 Generazione di codice C# tramite AI
