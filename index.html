@@ -270,21 +270,22 @@
                         contents: [{
                             parts: [{
                                 text: `Sei un esperto sviluppatore C#. Genera il codice C# in base alla richiesta dell'utente.
-Genera solo codice C# valido e compilabile, senza spiegazioni, markdown o backticks.
+Genera solo codice C# valido e compilabile, senza spiegazioni, markdown, backticks o commenti XML.
 NON usare \`\`\`c# o \`\`\` all'inizio o alla fine del codice.
+NON usare MAI commenti XML (/// <summary>, /// <param>, /// <returns>, ecc.).
+Usa SOLO commenti inline con // per spiegare il codice quando necessario.
 
 RICHIESTA UTENTE: ${prompt}
 
 REQUISITI:
 1. Genera SOLO il codice C# che soddisfa la richiesta, senza backticks o markdown
 2. Includi gli statement 'using' necessari
-3. NON includere commenti XML
+3. NON usare MAI commenti XML (///, <summary>, <param>, <returns>, ecc.)
 4. Usa nomi di variabili, metodi e classi in italiano
-5. Usa commenti in italiano per spiegare la logica complessa
+5. Usa SOLO commenti // in italiano per spiegare la logica quando necessario
 6. Il codice deve essere pulito ed efficiente
 7. Supporta qualsiasi tipo di codice C# (classi, interfacce, metodi, LINQ, ecc.)
-8. Usa commenti // in italiano quando necessario per spiegare la logica
-9. NON includere \`\`\`c# all'inizio o \`\`\` alla fine del codice`
+8. NON includere \`\`\`c# all'inizio o \`\`\` alla fine del codice`
                             }]
                         }],
                         generationConfig: {
@@ -309,9 +310,13 @@ REQUISITI:
                     throw new Error('Errore nella generazione del codice. Riprova.');
                 }
 
-                // Rimuovi eventuali backticks rimasti
+                // Rimuovi eventuali backticks e commenti XML rimasti
                 let code = data.candidates[0].content.parts[0].text;
-                code = code.replace(/```c#/g, '').replace(/```/g, '').trim();
+                code = code.replace(/```c#/g, '')
+                           .replace(/```/g, '')
+                           .replace(/\/\/\/.*\n/g, '') // Rimuove i commenti XML
+                           .replace(/\/\/\/ .*\n/g, '') // Rimuove i commenti XML con spazio
+                           .trim();
                 return code;
             } catch (error) {
                 console.error('Errore completo:', error);
