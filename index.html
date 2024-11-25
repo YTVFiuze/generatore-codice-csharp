@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generatore di Codice C#</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-weight: 600;
+            font-size: 2.2em;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            line-height: 1.5;
+            background-color: white;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        button[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #3182ce;
+            transform: translateY(-1px);
+        }
+
+        button[type="submit"]:disabled {
+            background-color: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .output-container {
+            position: relative;
+            margin-top: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .output-header h3 {
+            margin: 0;
+            color: #2d3748;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+
+        .output-content {
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        pre {
+            margin: 0;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 0 0 8px 8px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+        }
+        
+        .copy-button {
+            padding: 8px 15px;
+            background-color: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .copy-button:hover {
+            background-color: #38a169;
+            transform: translateY(-1px);
+        }
+        
+        .copy-button:active {
+            background-color: #2f855a;
+            transform: translateY(0);
+        }
+        
+        .copy-feedback {
+            position: absolute;
+            top: 12px;
+            right: 120px;
+            padding: 8px 12px;
+            background-color: #2d3748;
+            color: white;
+            border-radius: 6px;
+            opacity: 0;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+        
+        .copy-feedback.show {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        #loading {
+            margin: 20px 0;
+            text-align: center;
+            color: #4a5568;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #error {
+            margin: 20px 0;
+            color: #e53e3e;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: #fff5f5;
+            border: 1px solid #feb2b2;
+            display: none;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Generatore di Codice C#</h1>
+
+        <form id="codeForm">
+            <textarea id="prompt" placeholder="Descrivi il codice C# che vuoi generare (es: 'Crea una classe Persona con proprietà Nome e Età e un metodo per calcolare se la persona è maggiorenne')"></textarea>
+            <button type="submit" id="generateButton">Genera Codice</button>
+        </form>
+
+        <div id="loading" class="loading">Generazione del codice in corso...</div>
+        <div id="error" class="error"></div>
+
+        <div class="output-container">
+            <div class="output-header">
+                <h3>Codice C# Generato:</h3>
+                <button id="copyButton" class="copy-button">
+                    📋 Copia
+                </button>
+            </div>
+            <div class="output-content">
+                <pre><code id="generatedCode"></code></pre>
+            </div>
+            <span id="copyFeedback" class="copy-feedback">Copiato! ✓</span>
+        </div>
+    </div>
+
+    <script type="module">
+        import { generateWithAI, copyToClipboard } from './script.js';
+        import { GEMINI_API_KEY, GENERATION_CONFIG } from './config.js';
+
+        // Riferimenti agli elementi DOM
+        const form = document.querySelector('form');
+        const promptInput = document.getElementById('prompt');
+        const generateButton = document.querySelector('button[type="submit"]');
+        const loadingElement = document.getElementById('loading');
+        const errorElement = document.getElementById('error');
+        const generatedCodeElement = document.getElementById('generatedCode');
+        const copyButton = document.getElementById('copyButton');
+        const copyFeedback = document.getElementById('copyFeedback');
+
+        // Nascondi inizialmente gli elementi
+        if (loadingElement) loadingElement.style.display = 'none';
+        if (errorElement) errorElement.style.display = 'none';
+
+        // Gestione del form
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const prompt = promptInput.value.trim();
+            if (!prompt) {
+                if (errorElement) {
+                    errorElement.textContent = 'Per favore, inserisci una descrizione del codice da generare.';
+                    errorElement.style.display = 'block';
+                }
+                return;
+            }
+
+            // Resetta gli stati
+            if (errorElement) errorElement.style.display = 'none';
+            if (generatedCodeElement) generatedCodeElement.textContent = '';
+            if (generateButton) generateButton.disabled = true;
+            if (loadingElement) loadingElement.style.display = 'block';
+
+            try {
+                const generatedCode = await generateWithAI(prompt);
+                if (generatedCodeElement) {
+                    generatedCodeElement.textContent = generatedCode;
+                }
+            } catch (error) {
+                console.error('Errore durante la generazione:', error);
+                if (errorElement) {
+                    errorElement.textContent = 'Si è verificato un errore durante la generazione del codice. Riprova.';
+                    errorElement.style.display = 'block';
+                }
+            } finally {
+                if (generateButton) generateButton.disabled = false;
+                if (loadingElement) loadingElement.style.display = 'none';
+            }
+        });
+
+        // Gestione del pulsante di copia
+        if (copyButton) {
+            copyButton.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(generatedCodeElement.textContent);
+                    copyFeedback.classList.add('show');
+                    setTimeout(() => {
+                        copyFeedback.classList.remove('show');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Errore durante la copia:', err);
+                    alert('Non è stato possibile copiare il codice. Per favore, copialo manualmente.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
